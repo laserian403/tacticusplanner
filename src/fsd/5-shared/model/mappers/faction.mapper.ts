@@ -16,6 +16,8 @@ export function parseFaction(faction: string): Faction | undefined {
             return Faction.BloodAngels;
         case 'Dark Angels':
             return Faction.Dark_Angels;
+        case "Emperor's Children":
+            return Faction.EmperorsChildren;
         case 'Genestealer Cults':
             return Faction.GenestealerCults;
         case 'Orks':
