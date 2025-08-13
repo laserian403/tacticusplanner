@@ -9,10 +9,10 @@ export const useApi = <TResponse, TRequestBody = any>(
     url: string,
     body?: TRequestBody,
     deps?: Array<any>
-): { loading: boolean; error: string | null; data: TResponse | null } => {
+): { loading: boolean; error: IErrorResponse | null; data: TResponse | null } => {
     const [loading, setLoading] = useState<boolean>(false);
     const [data, setData] = useState<TResponse | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<IErrorResponse | null>(null);
     const fetchData = async () => {
         try {
             setLoading(true);
@@ -34,9 +34,13 @@ export const useApi = <TResponse, TRequestBody = any>(
                     console.info('Request was canceled');
                     return;
                 }
-                setError(error?.response?.data?.message || error.message);
+                setError({
+                    code: error.code,
+                    message: error?.response?.data?.message || error.message,
+                    status: error.status,
+                });
             } else {
-                setError(error.message);
+                setError({ message: error.message });
             }
 
             console.error(err);

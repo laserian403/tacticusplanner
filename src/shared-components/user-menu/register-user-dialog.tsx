@@ -109,11 +109,11 @@ export const RegisterUserDialog = ({ isOpen, onClose }: { isOpen: boolean; onClo
                                     { variant: 'success' }
                                 );
                             })
-                            .catch((err: AxiosError<IErrorResponse>) => {
-                                if (err.response?.status === 401) {
+                            .catch((err: IErrorResponse) => {
+                                if (err.status === 401) {
                                     enqueueSnackbar('Session expired. Please re-login.', { variant: 'error' });
-                                } else if (err.response?.status === 400) {
-                                    alert(err.response.data.message);
+                                } else if (err.status === 400) {
+                                    alert(err.message);
                                 } else {
                                     enqueueSnackbar('Something went wrong. Try again later', { variant: 'error' });
                                 }

@@ -60,15 +60,15 @@ export const LoginUserDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose:
                     onClick={() => {
                         setOpen(true);
                         loginUser(loginForm.username, loginForm.password)
-                            .then(response => {
-                                login(response.data?.accessToken ?? '');
+                            .then(data => {
+                                login(data?.accessToken ?? '');
                                 onClose();
                             })
-                            .catch((err: AxiosError<IErrorResponse>) => {
-                                if (err.response?.status === 401) {
+                            .catch((err: IErrorResponse) => {
+                                if (err.status === 401) {
                                     enqueueSnackbar('Session expired. Please re-login.', { variant: 'error' });
-                                } else if (err.response?.status === 400) {
-                                    alert(err.response.data.message);
+                                } else if (err.status === 400) {
+                                    alert(err.message);
                                 } else {
                                     enqueueSnackbar('Something went wrong. Try again later', { variant: 'error' });
                                 }
