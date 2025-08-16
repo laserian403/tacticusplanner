@@ -7,9 +7,10 @@ interface IAuthContext {
     shareToken?: string;
     isAuthenticated: boolean;
     token: string;
+    refreshToken: string;
     userInfo: IUserInfo;
 
-    login(token: string): void;
+    login(accessToken: string, refreshToken?: string): void;
 
     logout(): void;
 
@@ -24,6 +25,7 @@ export const AuthContext = createContext<IAuthContext>({
     username: 'Tactician',
     isAuthenticated: !!localStorage.getItem(localStorageKey),
     token: localStorage.getItem(localStorageKey) ?? '',
+    refreshToken: localStorage.getItem('refresh_token') ?? '',
     userInfo: {} as any,
 
     login(): void {},

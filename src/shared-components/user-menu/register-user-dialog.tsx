@@ -29,6 +29,7 @@ export const RegisterUserDialog = ({ isOpen, onClose }: { isOpen: boolean; onClo
 
     const [open, setOpen] = React.useState(false);
     const usernamePattern = /^[a-zA-Z0-9_-]{3,20}$/;
+    const emailRegistration = import.meta.env.VITE_USE_SUPABASE === 'true';
 
     return (
         <Dialog open={isOpen} onClose={() => onClose(false)}>
@@ -36,16 +37,18 @@ export const RegisterUserDialog = ({ isOpen, onClose }: { isOpen: boolean; onClo
             <DialogContent>
                 <Box component="form" id="registration-form" onSubmit={event => event.preventDefault()}>
                     <FormControl required fullWidth variant={'standard'}>
-                        <InputLabel htmlFor="username-input">Username</InputLabel>
+                        <InputLabel htmlFor="username-input">{emailRegistration ? `Email` : `Username`}</InputLabel>
                         <Input
                             id="username-input"
                             inputProps={{ pattern: usernamePattern }}
                             autoComplete="off"
                             onChange={event => setRegisterForm(curr => ({ ...curr, username: event.target.value }))}
                         />
-                        <FormHelperText id="username-helper-text">
-                            Should be between 3 to 20 characters long. Only [a-zA-Z0-9_-] characters are allowed.
-                        </FormHelperText>
+                        {!emailRegistration && (
+                            <FormHelperText id="username-helper-text">
+                                Should be between 3 to 20 characters long. Only [a-zA-Z0-9_-] characters are allowed.
+                            </FormHelperText>
+                        )}
                     </FormControl>
                     <FormControl required fullWidth variant={'standard'}>
                         <InputLabel htmlFor="password-input">Password</InputLabel>
@@ -83,7 +86,7 @@ export const RegisterUserDialog = ({ isOpen, onClose }: { isOpen: boolean; onClo
                             return;
                         }
 
-                        if (!usernamePattern.test(registerForm.username)) {
+                        if (!emailRegistration && !usernamePattern.test(registerForm.username)) {
                             alert(
                                 'Username should be between 3 to 20 characters long. Only [a-zA-Z0-9_-] characters are allowed.'
                             );
@@ -109,11 +112,11 @@ export const RegisterUserDialog = ({ isOpen, onClose }: { isOpen: boolean; onClo
                                     { variant: 'success' }
                                 );
                             })
-                            .catch((err: AxiosError<IErrorResponse>) => {
-                                if (err.response?.status === 401) {
+                            .catch((err: IErrorResponse) => {
+                                if (err.status === 401) {
                                     enqueueSnackbar('Session expired. Please re-login.', { variant: 'error' });
-                                } else if (err.response?.status === 400) {
-                                    alert(err.response.data.message);
+                                } else if (err.status === 400) {
+                                    alert(err.message);
                                 } else {
                                     enqueueSnackbar('Something went wrong. Try again later', { variant: 'error' });
                                 }

@@ -7,7 +7,7 @@ export const makeApiCall = <TResponse, TRequestBody = any>(
     method: Method,
     url: string,
     body?: TRequestBody
-): Promise<{ data: TResponse | null; error: string | null }> => {
+): Promise<{ data: TResponse | null; error: IErrorResponse | null }> => {
     const fetchData = async () => {
         try {
             const response = await API<TResponse, AxiosResponse<TResponse>, TRequestBody>({
@@ -28,9 +28,16 @@ export const makeApiCall = <TResponse, TRequestBody = any>(
                     console.info('Request was canceled');
                     return { data: null, error: null };
                 }
-                return { data: null, error: error?.response?.data?.message || error.message };
+                return {
+                    data: null,
+                    error: {
+                        code: error.code,
+                        message: error?.response?.data?.message || error.message,
+                        status: error.status,
+                    },
+                };
             } else {
-                return { data: null, error: error.message };
+                return { data: null, error: { message: error.message } };
             }
         }
     };
