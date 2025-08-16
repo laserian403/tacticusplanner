@@ -257,7 +257,7 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
         getUserDataApi()
             .then(response => {
                 if (!response.data) {
-                    console.error(response.error);
+                    if (response.error) console.error(response.error);
                     enqueueSnackbar('Failed to fetch data from server. Try again later', { variant: 'error' });
                     return;
                 }
