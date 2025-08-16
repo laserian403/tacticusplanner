@@ -61,7 +61,7 @@ export const LoginUserDialog = ({ isOpen, onClose }: { isOpen: boolean; onClose:
                         setOpen(true);
                         loginUser(loginForm.username, loginForm.password)
                             .then(data => {
-                                login(data?.accessToken ?? '');
+                                login(data?.accessToken ?? '', data?.refreshToken ?? '');
                                 onClose();
                             })
                             .catch((err: IErrorResponse) => {
