@@ -297,7 +297,7 @@ export const StoreProvider = ({ children }: React.PropsWithChildren) => {
                 const shouldAcceptServerData =
                     !isFirstLogin && (isFreshData || modifiedDate < serverLastModified || hasDataConflict);
                 const shouldPushLocalData =
-                    !isFreshData && !hasDataConflict && (isFirstLogin || modifiedDate > serverLastModified);
+                    isFirstLogin || (!isFreshData && !hasDataConflict && modifiedDate > serverLastModified);
 
                 localStorage.setItem('TP-ModifiedDateTicks', serverModifiedDateTicks);
 
