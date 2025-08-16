@@ -194,7 +194,7 @@ export const UserMenu = () => {
         <Box sx={{ display: 'flex', textAlign: 'center', justifyContent: 'flex-end' }}>
             <input ref={inputRef} style={{ display: 'none' }} type="file" accept=".json" onChange={handleFileUpload} />
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ fontSize: 16, fontWeight: 700 }}>Hi, {username}</span>
+                {username && <span style={{ fontSize: 16, fontWeight: 700 }}>Hi, {username}</span>}
                 <Badge
                     color={hasRejectedGuides ? 'error' : 'warning'}
                     badgeContent={hasRejectedGuides ? userInfo.rejectedTeamsCount : userInfo.pendingTeamsCount}>
@@ -205,7 +205,7 @@ export const UserMenu = () => {
                         aria-controls={userMenuControls.open ? 'account-menu' : undefined}
                         aria-haspopup="true"
                         aria-expanded={userMenuControls.open ? 'true' : undefined}>
-                        {isAuthenticated ? (
+                        {isAuthenticated && username ? (
                             <Avatar {...stringAvatar(username)}></Avatar>
                         ) : (
                             <Avatar sx={{ width: 32, height: 32 }}>TP</Avatar>
