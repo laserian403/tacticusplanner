@@ -5,6 +5,7 @@ export enum PersonalGoalType {
     Unlock = 3,
     MowAbilities = 4,
     CharacterAbilities = 5,
+    AscendMythic = 6,
 }
 
 export enum CampaignsLocationsUsage {

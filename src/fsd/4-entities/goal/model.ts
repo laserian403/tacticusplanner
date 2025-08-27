@@ -49,9 +49,7 @@ export interface ICharacterUnlockGoal extends ICharacterRaidGoalSelectBase {
     campaignsUsage: CampaignsLocationsUsage;
 }
 
-export interface ICharacterAscendGoal extends ICharacterRaidGoalSelectBase {
-    type: PersonalGoalType.Ascend;
-
+export interface ICharacterAscendGoalBase extends ICharacterRaidGoalSelectBase {
     rarityStart: Rarity;
     starsStart: RarityStars;
     starsEnd: RarityStars;
@@ -60,3 +58,13 @@ export interface ICharacterAscendGoal extends ICharacterRaidGoalSelectBase {
     onslaughtShards: number;
     campaignsUsage: CampaignsLocationsUsage;
 }
+
+export interface ICharacterAscendStandardGoal extends ICharacterAscendGoalBase {
+    type: PersonalGoalType.Ascend;
+}
+
+export interface ICharacterAscendMythicGoal extends ICharacterAscendGoalBase {
+    type: PersonalGoalType.AscendMythic;
+}
+
+export type ICharacterAscendGoal = ICharacterAscendStandardGoal | ICharacterAscendMythicGoal;

@@ -12,7 +12,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import InputLabel from '@mui/material/InputLabel';
-import { first } from 'lodash';
 import { enqueueSnackbar } from 'notistack';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
@@ -44,6 +43,7 @@ import { CharactersAbilitiesService } from '@/v2/features/characters/characters-
 import { IUnit } from 'src/v2/features/characters/characters.models';
 
 import { IgnoreRankRarity } from './ignore-rank-rarity';
+import { SetAscendMythicGoal } from './set-ascend-mythic-goal';
 
 const getDefaultForm = (priority: number): IPersonalGoal => ({
     id: v4(),
@@ -67,9 +67,9 @@ export const SetGoalDialog = ({ onClose }: { onClose?: (goal?: IPersonalGoal) =>
 
     const dispatch = useContext(DispatchContext);
 
-    const [openDialog, setOpenDialog] = React.useState(false);
-    const [ignoreRankRarity, setIgnoreRankRarity] = React.useState(false);
-    const [unit, setUnit] = React.useState<IUnit | null>(null);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [ignoreRankRarity, setIgnoreRankRarity] = useState(false);
+    const [unit, setUnit] = useState<IUnit | null>(null);
 
     const [form, setForm] = useState<IPersonalGoal>(() => getDefaultForm(goals.length + 1));
 
@@ -132,9 +132,10 @@ export const SetGoalDialog = ({ onClose }: { onClose?: (goal?: IPersonalGoal) =>
         }
     }, [form.type, ignoreRankRarity, resolvedMows, characters]);
 
-    const getAscensionShardsName = (unit: IUnit | null): string => {
+    const getAscensionShardsName = (unit: IUnit | null, mythic: boolean = false): string => {
         if (!unit) return '';
-        return 'shards_' + unit.snowprintId;
+        const prefix = mythic ? 'mythicShards_' : 'shards_';
+        return prefix + unit.snowprintId;
     };
 
     const possibleLocations =
@@ -143,6 +144,18 @@ export const SetGoalDialog = ({ onClose }: { onClose?: (goal?: IPersonalGoal) =>
             : [];
 
     const unlockedLocations = possibleLocations
+        .filter(location => {
+            const campaignProgress = campaignsProgress[location.campaign as keyof ICampaignsProgress];
+            return location.nodeNumber <= campaignProgress;
+        })
+        .map(x => x.id);
+
+    const possibleMythicShardLocations =
+        form.type === PersonalGoalType.AscendMythic && !!unit
+            ? StaticDataService.getItemLocations(getAscensionShardsName(unit, true))
+            : [];
+
+    const unlockedMythicShardLocations = possibleMythicShardLocations
         .filter(location => {
             const campaignProgress = campaignsProgress[location.campaign as keyof ICampaignsProgress];
             return location.nodeNumber <= campaignProgress;
@@ -197,6 +210,13 @@ export const SetGoalDialog = ({ onClose }: { onClose?: (goal?: IPersonalGoal) =>
         }
 
         if (form.type === PersonalGoalType.Ascend) {
+            return (
+                (unit.rarity === form.targetRarity && unit.stars === form.targetStars) ||
+                (!unlockedLocations.length && form.shardsPerToken! <= 0)
+            );
+        }
+
+        if (form.type === PersonalGoalType.AscendMythic) {
             return (
                 (unit.rarity === form.targetRarity && unit.stars === form.targetStars) ||
                 (!unlockedLocations.length && form.shardsPerToken! <= 0)
@@ -261,6 +281,7 @@ export const SetGoalDialog = ({ onClose }: { onClose?: (goal?: IPersonalGoal) =>
                                     onChange={handleGoalTypeChange}>
                                     <MenuItem value={PersonalGoalType.UpgradeRank}>Upgrade Rank</MenuItem>
                                     <MenuItem value={PersonalGoalType.Ascend}>Ascend</MenuItem>
+                                    <MenuItem value={PersonalGoalType.AscendMythic}>Ascend to Mythic</MenuItem>
                                     <MenuItem value={PersonalGoalType.Unlock}>Unlock</MenuItem>
                                     <MenuItem value={PersonalGoalType.MowAbilities}>MoW Abilities</MenuItem>
                                     <MenuItem value={PersonalGoalType.CharacterAbilities}>Character Abilities</MenuItem>
@@ -382,6 +403,19 @@ export const SetGoalDialog = ({ onClose }: { onClose?: (goal?: IPersonalGoal) =>
                                 targetStars={form.targetStars!}
                                 possibleLocations={possibleLocations}
                                 unlockedLocations={unlockedLocations}
+                                campaignsUsage={form.campaignsUsage!}
+                                shardsPerToken={form.shardsPerToken!}
+                                onChange={handleAscendGoalChanges}
+                            />
+                        )}
+
+                        {form.type === PersonalGoalType.AscendMythic && !!unit && (
+                            <SetAscendMythicGoal
+                                currentRarity={unit.rarity}
+                                currentStars={unit.stars}
+                                targetStars={form.targetStars!}
+                                possibleLocations={possibleMythicShardLocations}
+                                unlockedLocations={unlockedMythicShardLocations}
                                 campaignsUsage={form.campaignsUsage!}
                                 shardsPerToken={form.shardsPerToken!}
                                 onChange={handleAscendGoalChanges}
