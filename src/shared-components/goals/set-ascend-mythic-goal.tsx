@@ -1,6 +1,5 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
-import { rarityToMaxStars, rarityToStars } from 'src/models/constants';
 import { CampaignsLocationsUsage } from 'src/models/enums';
 import { ICampaignBattleComposed, IPersonalGoal } from 'src/models/interfaces';
 
@@ -11,7 +10,6 @@ import { AscendGoalBase } from './set-ascend-goal-base';
 
 interface Props {
     currentRarity: Rarity;
-    targetRarity: Rarity;
     currentStars: RarityStars;
     targetStars: RarityStars;
     possibleLocations: ICampaignBattleComposed[];
@@ -21,9 +19,8 @@ interface Props {
     onChange: (key: keyof IPersonalGoal, value: number) => void;
 }
 
-export const SetAscendGoal: React.FC<Props> = ({
+export const SetAscendMythicGoal: React.FC<Props> = ({
     currentRarity,
-    targetRarity,
     currentStars,
     targetStars,
     possibleLocations,
@@ -32,28 +29,19 @@ export const SetAscendGoal: React.FC<Props> = ({
     shardsPerToken,
     onChange,
 }) => {
-    const rarityValues = useMemo(() => {
-        return getEnumValues(Rarity).filter(x => x >= currentRarity && x !== Rarity.Mythic);
-    }, [currentRarity]);
+    const rarityValues = [Rarity.Mythic];
 
     const starsValues = useMemo(() => {
-        const minStars = rarityToStars[targetRarity];
-        const maxStars = Math.min(
-            rarityToMaxStars[targetRarity],
-            RarityStars.OneBlueStar // Regular ascend max
-        );
-        return getEnumValues(RarityStars).filter(x => x >= minStars && x <= maxStars);
-    }, [targetRarity]);
+        return getEnumValues(RarityStars).filter(x => x >= RarityStars.OneBlueStar && x <= RarityStars.MythicWings);
+    }, []);
 
-    const handleRarityChange = (rarity: Rarity) => {
-        onChange('targetRarity', rarity);
-        onChange('targetStars', rarityToStars[rarity]);
-    };
+    // Rarity is always Mythic, this no-op is to satisfy the interface of the base component
+    const handleRarityChange = () => {};
 
     return (
         <AscendGoalBase
             currentRarity={currentRarity}
-            targetRarity={targetRarity}
+            targetRarity={Rarity.Mythic}
             currentStars={currentStars}
             targetStars={targetStars}
             possibleLocations={possibleLocations}
@@ -63,9 +51,9 @@ export const SetAscendGoal: React.FC<Props> = ({
             starsValues={starsValues}
             shardsPerTokenValue={shardsPerToken}
             shardsInputConfig={{
-                title: 'Shards per onslaught',
+                title: 'Mythic shards per onslaught',
                 helperText: 'Put 0 to ignore Onslaught raids',
-                noLocationsHelperText: 'You should put more than 0 to be able to create the goal',
+                noLocationsHelperText: 'You should put more than 0 mythic shards to be able to create the goal',
             }}
             onChange={onChange}
             onRarityChange={handleRarityChange}
